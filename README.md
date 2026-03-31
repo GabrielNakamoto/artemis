@@ -1,7 +1,7 @@
 # Artemis
 > Minimal Model Context Protocol for live NT4 robot connection.
 
-Exposes topics for model reading and publishing single or batched/timestamped values.
+Exposes topics for LLM model reading and publishing of single or batched/timestamped values over network table connection to robot.
 Publishing limited to subtables under tuning table prefix (cli option ``--tuning-prefix=<prefix>``)
 
 ### Uses:
