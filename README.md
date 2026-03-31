@@ -13,5 +13,5 @@ Publishing limited to subtables under tuning table prefix (cli option ``--tuning
 ```
 uv venv
 uv add "mcp[cli]" pyntcore
-uv run artemis.py <team number>
+claude mcp add artemis -- uv run --directory <your artemis dir> python artemis.py <your team number> 
 ```
