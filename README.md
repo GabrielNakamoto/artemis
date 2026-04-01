@@ -7,7 +7,7 @@
 - Publishing limited to subtables under tuning table prefix (cli option ``--tuning-prefix=<prefix>``)
 
 ## Apollo - .wpilog file
-> See simple [example conversation](./apollo-mcp-example.txt) reviewing wpilog with claude using apollo
+> See simple [example conversation](./turret-controls-review-claude-apollo.txt) reviewing turret control systems tuning from a competition wpilog with claude using a local apollo MCP server
 - Rudimentary mcp wrapper for .wpilog parsing
 
 ### Uses
