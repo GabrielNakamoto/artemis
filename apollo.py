@@ -17,7 +17,6 @@ DECODERS = {
     "boolean[]": lambda d: [b != 0 for b in d],
 }
 
-
 def _read_int(buf, offset, size):
     """Read a little-endian unsigned int of 1/2/4 bytes."""
     return int.from_bytes(buf[offset:offset + size], "little"), offset + size
@@ -29,9 +28,12 @@ def _read_lp_string(buf, offset):
     offset += 4
     return buf[offset:offset + slen].decode("utf-8", errors="replace"), offset + slen
 
-
+# lazy parse entire file
+log_entries: list | None = None
 def parse(path):
     """Yield (entry_id, timestamp_us, payload_bytes) for every record."""
+    global log_entries
+    if log_entries is not None: return log_entries
     with open(path, "rb") as f:
         buf = f.read()
 
@@ -41,6 +43,7 @@ def parse(path):
     extra_len = struct.unpack_from("<I", buf, 8)[0]
     pos = 12 + extra_len
 
+    log_entries = []
     while pos < len(buf):
         bitfield = buf[pos]; pos += 1
         id_size   = ((bitfield & 0x03) + 1)          # 1-4 bytes
@@ -54,12 +57,13 @@ def parse(path):
         payload = buf[pos:pos + payload_sz]
         pos += payload_sz
 
-        yield entry_id, timestamp, payload
+        log_entries.append((entry_id, timestamp, payload))
+    return log_entries
 
 def entries(path):
     """Return {entry_id: (name, type_str)} from control-start records."""
     result = {}
-    for entry_id, _ts, payload in parse(path):
+    for entry_id, _, payload in parse(path):
         if entry_id != 0 or len(payload) < 1 or payload[0] != 0:
             continue
         # control start: 1-byte type (0), 4-byte target entry id, then name, type, metadata
@@ -72,14 +76,15 @@ def entries(path):
 
 
 @mcp.tool()
-def read_nt(path, prefix="/", last_n: None | int =None):
+def read_nt(path, prefix="/", quantize_level: int | None = None, time_range: tuple[int, int] | None = None):
     """
     Read NT entries from a wpilog file.
 
     Args:
         path:   Path to .wpilog file
         prefix: Only return entries whose name starts with this (default "/")
-        last_n: If set, only return the last N records per entry name
+        quantize_level (optional): coarsity of signals, returns every quantize_levelth value per record name
+        time_range (optional): tuple of form (min timestamp, max timestamp) to filter all returned records by
 
     Returns:
         List of {timestamp_us, name, type, value} dicts
@@ -102,7 +107,7 @@ def read_nt(path, prefix="/", last_n: None | int =None):
             continue
         records.append({"timestamp_us": ts, "name": name, "type": type_str, "value": value})
 
-    if last_n is not None:
+    if quantize_level is not None:
         # keep last N per name
         from collections import defaultdict
         buckets = defaultdict(list)
@@ -110,9 +115,10 @@ def read_nt(path, prefix="/", last_n: None | int =None):
             buckets[r["name"]].append(r)
         records = []
         for recs in buckets.values():
-            records.extend(recs[-last_n:])
+           records.extend(recs[::quantize_level])
         records.sort(key=lambda r: r["timestamp_us"])
-
+    if time_range is not None:
+        records = list(filter(lambda x: x["timestamp_us"] >= time_range[0] and x["timestamp_us"] <= time_range[1], records))
     return records
 
 

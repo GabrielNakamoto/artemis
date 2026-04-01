@@ -10,7 +10,7 @@
 > See simple [example conversation](./apollo-mcp-example.txt) reviewing wpilog with claude using apollo
 - Rudimentary mcp wrapper for .wpilog parsing
 
-### Uses:
+### Uses
 - Control system tuning
 - Live debugging of mechanical systems
 - Performance/limiting factor identification
@@ -26,4 +26,6 @@ claude mcp add --transport stdio apollo --scope user -- uv run --directory <your
 
 ### Todo
 - lots of performance improvements/make it easier for LLM to parse important info
-    - quantizing/downsampling
+    [x] quantizing/downsampling
+[x] let model search entries by time range
+[x] cache read entries for apollo
