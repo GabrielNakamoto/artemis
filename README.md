@@ -1,13 +1,14 @@
 # Artemis
 > Minimal Model Context Protocol for FRC live NT4 connection or wpilogs
 
-Exposes topics for LLM model reading and publishing of single or batched/timestamped values over network table connection to robot.
-Publishing limited to subtables under tuning table prefix (cli option ``--tuning-prefix=<prefix>``)
 
-**Artemis - NT4 live connection**
-**Apollo - .wpilog file**
+## Artemis - NT4 live connection
+- Exposes topics for LLM model reading and publishing of single or batched/timestamped values over network table connection to robot.
+- Publishing limited to subtables under tuning table prefix (cli option ``--tuning-prefix=<prefix>``)
 
+## Apollo - .wpilog file
 > See simple [example conversation](./apollo-mcp-example.txt) reviewing wpilog with claude using apollo
+- Rudimentary mcp wrapper for .wpilog parsing
 
 ### Uses:
 - Control system tuning
