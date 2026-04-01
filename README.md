@@ -7,6 +7,8 @@ Publishing limited to subtables under tuning table prefix (cli option ``--tuning
 **Artemis - NT4 live connection**
 **Apollo - .wpilog file**
 
+> See simple [example conversation](./apollo-mcp-example.txt) reviewing wpilog with claude using apollo
+
 ### Uses:
 - Control system tuning
 - Live debugging of mechanical systems

@@ -1,0 +1,367 @@
+╭─── Claude Code v2.1.89 ──────────────────────────────────────────────────────╮
+│                             │ Tips for getting started                       │
+│     Welcome back Raine!     │ Run /init to create a CLAUDE.md file with ins… │
+│                             │ Note: You have launched claude in your home d… │
+│           ▐▛███▜▌           │ ────────────────────────────────────────────── │
+│          ▝▜█████▛▘          │ Recent activity                                │
+│            ▘▘ ▝▝            │ No recent activity                             │
+│                             │                                                │
+│   Sonnet 4.6 · Claude Pro   │                                                │
+│         /home/raine         │                                                │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+● apollo - read_nt (MCP)(path: "akit_26-03-21_22-16-58_onnob_q32.wpilog",
+                        prefix: "/Hood", last_n: 3)
+
+● apollo - read_nt (MCP)(path: "akit_26-03-21_22-16-58_onnob_q32.wpilog",
+                        prefix: "/Azimuth", last_n: 3)
+
+● apollo - read_nt (MCP)(path: "akit_26-03-21_22-16-58_onnob_q32.wpilog",
+                        prefix: "/Spindexer", last_n: 3)
+
+● apollo - read_nt (MCP)(path: "akit_26-03-21_22-16-58_onnob_q32.wpilog",
+                        prefix: "/Intake", last_n: 3)
+
+● apollo - read_nt (MCP)(path: "akit_26-03-21_22-16-58_onnob_q32.wpilog",
+                        prefix: "/RealOutputs/Logger", last_n: 10)
+
+● apollo - read_nt (MCP)(path: "akit_26-03-21_22-16-58_onnob_q32.wpilog",
+                        prefix: "/RealOutputs/LoggedRobot/FullCycleMS")
+  ⎿  Error: result (3,538,371 characters) exceeds maximum allowed tokens. O
+     utput has been saved to /home/raine/.claude/projects/-home-raine/f7250
+     794-cda3-4e96-b853-eff7bfd8b4ff/tool-results/mcp-apollo-read_nt-177501
+     … +12 lines (ctrl+o to expand)
+
+● I now have all the data needed for a full report.
+
+  ---
+  Subsystem Performance Review — akit_26-03-21_22-16-58_onnob_q32.wpilog
+
+  Log duration: ~504 seconds (~8.4 min), timestamps 25s → 529s
+  Match structure: Teleop → Auto (~T=289–313s) → Teleop
+
+  ---
+  Robot Loop Timing
+
+  ┌───────────────┬─────────────┬────────────┐
+  │    Metric     │   Typical   │    Peak    │
+  ├───────────────┼─────────────┼────────────┤
+  │ FullCycleMS   │ 9.4–14.5 ms │ 49.2 ms ⚠️ │
+  ├───────────────┼─────────────┼────────────┤
+  │ UserCodeMS    │ 7–12 ms     │ 45.9 ms ⚠️ │
+  ├───────────────┼─────────────┼────────────┤
+  │ LogPeriodicMS │ 1.4–4.2 ms  │ 5.9 ms     │
+  ├───────────────┼─────────────┼────────────┤
+  │ GC pause      │ 4–7 ms      │ 13 ms      │
+  └───────────────┴─────────────┴────────────┘
+
+  Critical: Two consecutive ~49ms loop overruns occurred at T≈528.76s and
+  T≈528.81s (late teleop). UserCode was the culprit (~43–46ms), not logging. GC
+  pauses are frequent (~every 500ms, 4–9ms) and account for some of the elevated
+   UserCodeMS.
+
+  ---
+  Auto Sequence (T=289–313s)
+
+  ┌──────┬────────────────────────────────┬────────────┐
+  │ Step │             Event              │ Match Time │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 0    │ STATE_CHANGE                   │ +0.19s     │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 1    │ CHOREO: MogSwipeLeft (4.65s)   │ +4.89s     │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 2    │ STATE_CHANGE                   │ +4.94s     │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 3    │ DRIVE_TO_POSE                  │ +5.96s     │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 4    │ WAIT                           │ +10.18s    │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 5    │ STATE_CHANGE                   │ +10.23s    │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 6    │ CHOREO: CleanSwipeLeft (4.96s) │ +15.24s    │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 7    │ STATE_CHANGE                   │ +15.31s    │
+  ├──────┼────────────────────────────────┼────────────┤
+  │ 8    │ DRIVE_TO_POSE                  │ +16.86s    │
+  └──────┴────────────────────────────────┴────────────┘
+
+  CleanSwipeLeft trajectory tracking converged well: linearError 1.86m→0.008m,
+  headingErr 89.8°→2.2° by end.
+
+  ---
+  Drive
+
+  - States used: TELEOP, CHOREO, TO_POSE, IDLE
+  - Vision measurements continuously fused during teleop (stdDevX ~0.075,
+  stdDevY ~0.030)
+  - No drive faults observed
+
+  ---
+  SuperStructure
+
+  States observed: IDLE, INTAKE, SHOOT, SHOOT_INTAKE, REVERSE_INTAKE
+
+  10 shoot cycles logged. Key tolerance patterns per shot:
+  - upToSpeed toggled frequently during SHOOT (launcher recovering between shots
+   — normal)
+  - hoodWithinTolerance toggled rapidly in several shoot sequences — hood
+  oscillating around setpoint, possibly tight tolerance or PID hunting
+  - azimuthWithinTolerance similarly unstable during several shots
+
+  ---
+  Launcher
+
+  ┌──────────────────────────┬────────────────┐
+  │          Metric          │     Value      │
+  ├──────────────────────────┼────────────────┤
+  │ Setpoint range           │ 10.0–37.6 RPS  │
+  ├──────────────────────────┼────────────────┤
+  │ Mean setpoint (all)      │ 28.4 RPS       │
+  ├──────────────────────────┼────────────────┤
+  │ Velocity range           │ 0–36.2 RPS     │
+  ├──────────────────────────┼────────────────┤
+  │ Mean velocity (all time) │ 15.0 RPS       │
+  ├──────────────────────────┼────────────────┤
+  │ IsConnected              │ ✅ always true │
+  └──────────────────────────┴────────────────┘
+
+  Velocity tracking appears functional. Setpoint of 10 RPS at idle suggests a
+  spin-up warmup baseline.
+
+  ---
+  Hood
+
+  ┌───────────────┬─────────────────────────────────────────────────────────┐
+  │    Metric     │                          Value                          │
+  ├───────────────┼─────────────────────────────────────────────────────────┤
+  │ Setpoint      │ 0–18.1°                                                 │
+  │ range         │                                                         │
+  ├───────────────┼─────────────────────────────────────────────────────────┤
+  │ Mean setpoint │ 8.5°                                                    │
+  ├───────────────┼─────────────────────────────────────────────────────────┤
+  │ IsConnected   │ ⚠️ brief disconnect at T=251.7s (reconnected ~30ms      │
+  │               │ later)                                                  │
+  └───────────────┴─────────────────────────────────────────────────────────┘
+
+  Hood tolerance oscillation during shoot cycles suggests either tight deadband
+  or PID gain tuning issue.
+
+  ---
+  Azimuth (Turret)
+
+  ┌──────────────────────┬──────────────────────────────────────────────────┐
+  │        Metric        │                      Value                       │
+  ├──────────────────────┼──────────────────────────────────────────────────┤
+  │ Setpoint range       │ −0.345 to +0.730 rad                             │
+  ├──────────────────────┼──────────────────────────────────────────────────┤
+  │ Mean setpoint        │ 0.142 rad                                        │
+  ├──────────────────────┼──────────────────────────────────────────────────┤
+  │ absolutePosition     │ −0.327 to +0.719 rad                             │
+  │ range                │                                                  │
+  ├──────────────────────┼──────────────────────────────────────────────────┤
+  │ IsConnected          │ ⚠️ brief disconnect at T=139.9s (reconnected at  │
+  │                      │ T=140.0s)                                        │
+  ├──────────────────────┼──────────────────────────────────────────────────┤
+  │ Camera enabled       │ Toggling on/off as expected                      │
+  └──────────────────────┴──────────────────────────────────────────────────┘
+
+  ---
+  Spindexer
+
+  10 feed cycles. State machine: HOLD → FEED (20/10 RPS) → COOLDOWN → HOLD
+  - 2 REVERSE events (T=309.3s, T=431.5s) — likely jam recovery
+  - Both index and feed motors connected by T=30s (disabled→enabled transition)
+  - Low idle currents at end (~1.4A feed, ~0.2A index) — normal hold state
+
+  ---
+  Intake
+
+  ┌─────────┬───────┐
+  │  State  │ Count │
+  ├─────────┼───────┤
+  │ RETRACT │ 26    │
+  ├─────────┼───────┤
+  │ INTAKE  │ 20    │
+  ├─────────┼───────┤
+  │ AGITATE │ 8     │
+  ├─────────┼───────┤
+  │ REVERSE │ 1     │
+  └─────────┴───────┘
+
+  - Intake velocity: up to ±2900 RPM (2700 RPM setpoint)
+  - ExtendConnected briefly false at T=524.7s (reconnected ~40ms later) — late
+  teleop hardware blip
+  - 8 agitate cycles suggest some difficulty with note pickup
+
+  ---
+  Vision
+
+  ┌────────────────┬─────────────┬─────────────┬──────────┬───────┬───────┐
+  │     Camera     │ acceptedMea │ rejectedMea │ Rejectio │ StdDe │ StdDe │
+  │                │      s      │      s      │  n Rate  │  v X  │  v Y  │
+  ├────────────────┼─────────────┼─────────────┼──────────┼───────┼───────┤
+  │ limelight-turr │ ~8335       │ ~1305       │ 13.5%    │ 0.076 │ 0.030 │
+  │ et             │             │             │          │       │       │
+  ├────────────────┼─────────────┼─────────────┼──────────┼───────┼───────┤
+  │ limelight-hopp │ ~8335       │ ~1305       │ 13.5%    │ 0.563 │ 1.365 │
+  │ er             │             │             │          │       │       │
+  └────────────────┴─────────────┴─────────────┴──────────┴───────┴───────┘
+
+  - Both limelights were offline during pre-auto (rawStdDevsPresent=false from
+  ~T=33s until T=289s). Vision only active during/after auto.
+  - limelight-turret has much tighter stdDevs than hopper — turret camera is
+  more reliable for localization
+  - hubObservations = 0 (no hub/target observations throughout)
+
+  ---
+  System Health
+
+  ┌──────────────────────────┬───────────┐
+  │          Metric          │   Value   │
+  ├──────────────────────────┼───────────┤
+  │ Battery voltage (end)    │ 12.26V ✅ │
+  ├──────────────────────────┼───────────┤
+  │ CAN utilization          │ 46–49% ✅ │
+  ├──────────────────────────┼───────────┤
+  │ PowerDistribution faults │ 0         │
+  └──────────────────────────┴───────────┘
+
+  ---
+  Key Issues to Investigate
+
+  1. ⚠️ Loop overrun (~49ms) at T≈528.8s — isolate which user code subsystem
+  caused the spike
+  2. ⚠️ Hood PID oscillation — hoodWithinTolerance toggling rapidly; consider
+  loosening deadband or tuning gains
+  3. ⚠️ Vision offline during teleop start — limelights not reporting until auto
+   (T=289s). Check LL connection/pipeline startup
+  4. GC pressure — pauses every ~500ms suggest object allocation; profile hot
+  paths
+  5. 2 Spindexer reverses — note jams during shots 2 and ~8; check note indexing
+   geometry/timing
+
+✻ Baked for 3m 40s
+
+❯ what does GC stand for                                                        
+
+● Garbage Collection — the JVM's automatic memory management process that
+  reclaims unused objects. In Java-based FRC robot code (WPILib), the JVM
+  periodically pauses execution to free heap memory, which shows up as GCTimeMS
+  spikes in the log.
+
+❯ how does the spindexer PID look (control signal vs setpoint)                  
+
+● apollo - read_nt (MCP)(path: "akit_26-03-21_22-16-58_onnob_q32.wpilog",
+                        prefix: "/Spindexer")
+  ⎿  Error: result (7,455,122 characters) exceeds maximum allowed tokens. O
+     utput has been saved to /home/raine/.claude/projects/-home-raine/f7250
+     794-cda3-4e96-b853-eff7bfd8b4ff/tool-results/mcp-apollo-read_nt-177501
+     … +12 lines (ctrl+o to expand)
+
+● Bash(python3 -c "
+      import json…)
+  ⎿  Spindexer channels:
+       FeedConnected: min=0.0000 max=1.0000 mean=0.5000 n=2
+       FeedMotorCurrent: min=0.0000 max=67.6557 mean=6.8254 n=9321
+     … +8 lines (ctrl+o to expand)
+
+● Bash(python3 -c "
+      import json…)
+  ⎿  === FEED Cycle 1 (295s-299s), setpoint=20 RPS ===
+       Feed velocity: n=170, min=0.66, max=118.96, mean=93.93
+       First 5 (ramp-up):
+     … +20 lines (ctrl+o to expand)
+
+● Bash(python3 -c "
+      import json…)
+  ⎿  === Index velocity analysis (setpoint=10 or -10 RPS) ===
+       FEED 1: dur=4.08s | sp=10 | ss_mean=56.88 RPS | error=-46.88 RPS | m
+     ax_curr=87.1A
+     … +17 lines (ctrl+o to expand)
+
+● Bash(python3 -c "
+      import json…)
+  ⎿  Feed Cycle 1: vel vs voltage over time
+        t (s)   vel (RPS)   volt (V)
+      295.124       0.660    -0.0014
+     … +21 lines (ctrl+o to expand)
+
+● Here's the full picture:
+
+  ---
+  Spindexer PID Analysis
+
+  Feed Motor (setpoint = 20 RPS)
+
+  ┌─────────┬────────────────┬─────────────┐
+  │  t (s)  │ Velocity (RPS) │ Voltage (V) │
+  ├─────────┼────────────────┼─────────────┤
+  │ 295.124 │ 0.7            │ ~0          │
+  ├─────────┼────────────────┼─────────────┤
+  │ 295.279 │ 84.8           │ 2.25        │
+  ├─────────┼────────────────┼─────────────┤
+  │ 295.451 │ 97.0           │ 2.21        │
+  ├─────────┼────────────────┼─────────────┤
+  │ 296.0+  │ ~90–115        │ ~2.20       │
+  └─────────┴────────────────┴─────────────┘
+
+  Steady-state across all 9 feed cycles:
+
+  ┌───────┬───────────────┬─────────────────┐
+  │ Cycle │ ss_mean (RPS) │ Error vs 20 RPS │
+  ├───────┼───────────────┼─────────────────┤
+  │ 1     │ 99.2          │ −79.2           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 2     │ 95.9          │ −75.9           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 3     │ 106.6         │ −86.6           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 4     │ 98.3          │ −78.3           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 5     │ 91.5          │ −71.5           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 6     │ 103.9         │ −83.9           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 7     │ 111.6         │ −91.6           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 8     │ 83.0          │ −63.0           │
+  ├───────┼───────────────┼─────────────────┤
+  │ 9     │ 107.8         │ −87.8           │
+  └───────┴───────────────┴─────────────────┘
+
+  Index Motor (setpoint = 10 RPS)
+
+  ┌────────────┬───────────────┬─────────────┬─────────────┐
+  │  Segment   │ ss_mean (RPS) │    Error    │ Max Current │
+  ├────────────┼───────────────┼─────────────┼─────────────┤
+  │ FEED ×9    │ ~52–62        │ ~−42 to −52 │ 70–88A      │
+  ├────────────┼───────────────┼─────────────┼─────────────┤
+  │ REVERSE ×2 │ −2 to −60     │ variable    │ 69–80A      │
+  └────────────┴───────────────┴─────────────┴─────────────┘
+
+  ---
+  Key Findings
+
+  1. Consistent ~5x velocity overshoot — Feed runs at ~95 RPS vs 20 RPS
+  setpoint; index at ~57 RPS vs 10 RPS. The ratio is too consistent to be a PID
+  tuning issue. This is almost certainly a gear ratio or unit conversion 
+  mismatch — the setpoint is in mechanism-level RPS, but the velocity feedback
+  is reporting motor-shaft RPS (through an unconverted gear ratio). The control
+  is effectively open-loop feedforward.
+
+  2. Voltage clamps at ~2.2V — Consistent across all cycles, not responding to
+  velocity error. This confirms the controller is running feedforward-only (no
+  closed-loop correction), or the feedback path has the wrong units and the PID
+  gain is effectively zero.
+
+  3. Very high index motor currents — Peak 115.9A (FEED 11), regularly 70–88A.
+  These are close to stall current for a Falcon 500 and indicate the note is
+  loading the index wheel heavily. This likely causes the 2 REVERSE events
+  (jams).
+
+  Bottom line: The spindexer PID has a gear ratio not applied to velocity
+  feedback. The motors still shoot notes (voltage is consistent and notes do get
+   fed), but there's no velocity regulation — current spikes and jams will
+  persist until the velocity sensor conversion matches the setpoint units.
+
+✻ Baked for 2m 30s
